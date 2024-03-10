@@ -10,15 +10,14 @@ import (
 
 type User struct {
 	// this not the model User, see this as a serializer
-	ID uint `json:"id"`
+	ID        uint   `json:"id"`
 	FirstName string `json:"first_name"`
-	LastName string `json:"last_name"`
+	LastName  string `json:"last_name"`
 }
 
 func CreateResponseUser(userModel models.User) User {
 	return User{ID: userModel.ID, FirstName: userModel.FirstName, LastName: userModel.LastName}
 }
-
 
 func CreateUser(c *fiber.Ctx) error {
 	var user models.User
@@ -32,7 +31,6 @@ func CreateUser(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(responseUser)
 }
-
 
 func GetUsers(c *fiber.Ctx) error {
 	users := []models.User{}
@@ -56,7 +54,6 @@ func findUser(id int, user *models.User) error {
 	return nil
 }
 
-
 func GetUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
@@ -73,7 +70,6 @@ func GetUser(c *fiber.Ctx) error {
 	return c.Status(200).JSON(responseUser)
 }
 
-
 func UpdateUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
@@ -88,7 +84,7 @@ func UpdateUser(c *fiber.Ctx) error {
 
 	type UpdateUser struct {
 		FirstName string `json:"first_name"`
-		LastName string `json:"last_name"`
+		LastName  string `json:"last_name"`
 	}
 
 	var updateData UpdateUser
@@ -106,7 +102,6 @@ func UpdateUser(c *fiber.Ctx) error {
 	return c.Status(200).JSON(responseUser)
 }
 
-
 func DeleteUser(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
@@ -120,7 +115,7 @@ func DeleteUser(c *fiber.Ctx) error {
 	}
 
 	if err := database.Database.Db.Delete(&user).Error; err != nil {
-		return c.Status(404).JSON(err.Error() )
+		return c.Status(404).JSON(err.Error())
 	}
 
 	return c.Status(200).SendString("user deleted")

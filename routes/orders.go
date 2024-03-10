@@ -24,15 +24,12 @@ import (
 // 	}
 // }
 
-
 type Order struct {
-	ID uint `json:"id"`
-	User User `json:"user"`
-	Product Product `json:"product"`
+	ID        uint      `json:"id"`
+	User      User      `json:"user"`
+	Product   Product   `json:"product"`
 	CreatedAt time.Time `json:"order_date"`
-
 }
-
 
 func CreateResponseOrder(order models.Order, user User, product Product) Order {
 	return Order{ID: order.ID, User: user, Product: product, CreatedAt: order.CreatedAt}
@@ -51,7 +48,7 @@ func CreateOrder(c *fiber.Ctx) error {
 	}
 
 	var product models.Product
-	if err := findProduct(order.ProductRefer, &product); err != nil {
+	if err := FindProduct(order.ProductRefer, &product); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
@@ -97,15 +94,14 @@ func GetOrder(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON("please ensure that id is an integer")
 	}
-	
+
 	if err := FindOrder(id, &order); err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
-
 	var user models.User
 	var product models.Product
-	
+
 	database.Database.Db.First(&user, order.UserRefer)
 	database.Database.Db.First(&product, order.ProductRefer)
 	responseUser := CreateResponseUser(user)
@@ -114,6 +110,5 @@ func GetOrder(c *fiber.Ctx) error {
 	responseOrder := CreateResponseOrder(order, responseUser, responseProduct)
 
 	return c.Status(200).JSON(responseOrder)
-
 
 }

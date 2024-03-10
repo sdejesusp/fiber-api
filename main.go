@@ -8,7 +8,6 @@ import (
 	"github.com/sdejesusp/fiber-api/routes"
 )
 
-
 func main() {
 	database.ConnectDb()
 	app := fiber.New()
@@ -17,7 +16,6 @@ func main() {
 
 	log.Fatal(app.Listen(":3000"))
 }
-
 
 func welcome(c *fiber.Ctx) error {
 	return c.SendString("hola")
@@ -35,12 +33,13 @@ func setupRoutes(app *fiber.App) {
 	users.Put("/:id", routes.UpdateUser)
 	users.Delete("/:id", routes.DeleteUser)
 
-	// Product endpoints 
+	// Product endpoints
 	products := app.Group("/api/products")
 	products.Post("", routes.CreateProduct)
 	products.Get("", routes.GetProducts)
 	products.Get("/:id", routes.GetProduct)
 	products.Put("/:id", routes.UpdateProduct)
+	products.Patch("/price/:id", routes.ChangeProductPrice)
 	products.Delete("/:id", routes.DeleteProduct)
 
 	// Order endpoints
