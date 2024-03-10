@@ -21,15 +21,22 @@ func CreateResponseProduct(productModel models.Product) Product {
 }
 
 func ValidateNewProduct(product models.Product) error {
-	if product.Price == "" {
-		return errors.New("please ensure that the price field is not empty")
+	if err := ValidateProductPrice(product.Price); err != nil {
+		return err
 	}
 
-	price, err := strconv.ParseFloat(product.Price, 64)
-	if err != nil || price < 0 {
-		return errors.New("invalid product price")
+	return nil
+}
+
+func ValidateProductPrice(productPrice string) error {
+	price, err := strconv.ParseFloat(productPrice, 64)
+	if err != nil {
+		return errors.New("invaid product price")
 	}
 
+	if price < 0 {
+		return errors.New("the price cannot be negative")
+	}
 	return nil
 }
 
@@ -87,7 +94,6 @@ func GetProduct(c *fiber.Ctx) error {
 
 	responseProduct := CreateResponseProduct(product)
 	return c.Status(200).JSON(responseProduct)
-
 }
 
 func UpdateProduct(c *fiber.Ctx) error {
@@ -140,6 +146,10 @@ func ChangeProductPrice(c *fiber.Ctx) error {
 	var updateData UpdatePrice
 
 	if err := c.BodyParser(&updateData); err != nil {
+		return c.Status(500).JSON(err.Error())
+	}
+
+	if err := ValidateProductPrice(updateData.Price); err != nil {
 		return c.Status(500).JSON(err.Error())
 	}
 
