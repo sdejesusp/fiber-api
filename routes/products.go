@@ -2,6 +2,7 @@ package routes
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sdejesusp/fiber-api/database"
@@ -19,10 +20,27 @@ func CreateResponseProduct(productModel models.Product) Product {
 	return Product{ID: productModel.ID, Name: productModel.Name, SerialNumber: productModel.SerialNumber, Price: productModel.Price}
 }
 
+func ValidateNewProduct(product models.Product) error {
+	if product.Price == "" {
+		return errors.New("please ensure that the price field is not empty")
+	}
+
+	price, err := strconv.ParseFloat(product.Price, 64)
+	if err != nil || price < 0 {
+		return errors.New("invalid product price")
+	}
+
+	return nil
+}
+
 func CreateProduct(c *fiber.Ctx) error {
 	var product models.Product
 
 	if err := c.BodyParser(&product); err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	if err := ValidateNewProduct(product); err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
